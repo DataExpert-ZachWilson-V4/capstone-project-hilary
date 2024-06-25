@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["airport_helpers"]
+
+[project]
+name = "airport_helpers"
+version = "0.0.1"
+
+requires-python = ">=3.8"
+
+description = "Python scripts for pulling airport data."
+readme = "README.md"
+keywords = ["airports", "data"]
+
+dependencies = [
+    "pandas",
+    "pyarrow",
+    "jupyter",
+    "fastparquet",
+    "airporttime",
+    "selenium",
+]
+
+[project.optional-dependencies]
+dev = ["ipykernel"]
