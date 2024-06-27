@@ -3,8 +3,10 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
+from pyspark.sql.types import StringType
+from pyspark.sql.functions import col, udf, upper
 import sys
+
 
 args = getResolvedOptions(
     sys.argv,
@@ -49,6 +51,7 @@ CREATE OR REPLACE TABLE {fact_output_table} (
     flightdate STRING,	
     reporting_airline STRING,
     tail_number STRING,
+    faa_tail_number STRING,
     flight_number_reporting_airline BIGINT,
     origin_airport_id BIGINT,
     dest_airport_id BIGINT,
@@ -88,13 +91,24 @@ PARTITIONED BY (flightdate)
 """
 )
 
-# Write the DataFrame to the Iceberg table
+
+def create_faa_tail_number(tail_number):
+    if isinstance(tail_number, str):
+        if tail_number[0] == "N":
+            return tail_number[1:]
+    return tail_number
+
+
+tail_num_udf = udf(create_faa_tail_number, StringType())
+
 (
     df.withColumn("flightdate", col("flightdate").cast("date"))
+    .withColumn("faa_tail_number", tail_num_udf(upper(col("tail_number"))))
     .select(
         col("flightdate"),
         col("reporting_airline"),
         col("tail_number"),
+        col("faa_tail_number"),
         col("flight_number_reporting_airline"),
         col("OriginAirportID").alias("origin_airport_id"),
         col("DestAirportID").alias("dest_airport_id"),
