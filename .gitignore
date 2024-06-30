@@ -5,3 +5,4 @@ airport_data/
 .env
 .DS_Store
 src/scratch/
+src/kafka/client.properties

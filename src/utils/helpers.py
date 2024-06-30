@@ -3,7 +3,9 @@ from botocore.exceptions import NoCredentialsError, ClientError
 
 
 def get_secret(secret_name, region_name="us-west-2"):
-    full_secret_name = f"airflow/variables/{secret_name}"
+    full_secret_name = (
+        secret_name if "HILARY" in secret_name else f"airflow/variables/{secret_name}"
+    )
     client = boto3.client(service_name="secretsmanager", region_name=region_name)
     response = client.get_secret_value(SecretId=full_secret_name)
     return (

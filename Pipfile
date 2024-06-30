@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 airport-helpers = {editable = true, path = "."}
 boto3 = "*"
+confluent-kafka = "*"
+trino = "*"
 
 [dev-packages]
 black = "*"

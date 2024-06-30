@@ -178,9 +178,9 @@ dest_airport_df = df.select(
     col("DestState").alias("airport_state"),
     col("DestWac").alias("airport_world_area_code"),
 )
-origin_airport_df.union(dest_airport_df).dropDuplicates().writeTo(
-    dim_output_table
-).createOrReplace()
+origin_airport_df.union(dest_airport_df).withColumn(
+    "airport_location", upper(col("airport_location"))
+).dropDuplicates().writeTo(dim_output_table).createOrReplace()
 
 job = Job(glueContext)
 job.init(args["JOB_NAME"], args)

@@ -4,25 +4,30 @@ from pyspark.sql import SparkSession
 from awsglue.utils import getResolvedOptions
 import sys
 
-catalog_name = 'eczachly-academy-warehouse'
-spark = (SparkSession.builder.config(
-    'spark.sql.defaultCatalog', catalog_name)
-         .config(f"spark.sql.catalog.{catalog_name}", "org.apache.iceberg.spark.SparkCatalog")
-         .config(
-    f'spark.sql.catalog.{catalog_name}.catalog-impl',
-    'org.apache.iceberg.rest.RESTCatalog')
-         .config(
-    f'spark.sql.catalog.{catalog_name}.warehouse',
-    catalog_name).config(
-    'spark.sql.catalog.eczachly-academy-warehouse.uri',
-    'https://api.tabular.io/ws/').getOrCreate())
+catalog_name = "eczachly-academy-warehouse"
+spark = (
+    SparkSession.builder.config("spark.sql.defaultCatalog", catalog_name)
+    .config(
+        f"spark.sql.catalog.{catalog_name}", "org.apache.iceberg.spark.SparkCatalog"
+    )
+    .config(
+        f"spark.sql.catalog.{catalog_name}.catalog-impl",
+        "org.apache.iceberg.rest.RESTCatalog",
+    )
+    .config(f"spark.sql.catalog.{catalog_name}.warehouse", catalog_name)
+    .config(
+        "spark.sql.catalog.eczachly-academy-warehouse.uri", "https://api.tabular.io/ws/"
+    )
+    .getOrCreate()
+)
 
-args = getResolvedOptions(sys.argv, ["JOB_NAME", 'output_table'])
+args = getResolvedOptions(sys.argv, ["JOB_NAME", "output_table"])
 output_table = args["output_table"]
 
 glueContext = GlueContext(spark.sparkContext)
 spark = glueContext.spark_session
-spark.sql(f"""
+spark.sql(
+    f"""
    CREATE TABLE IF NOT EXISTS {output_table} (
     reporting_airline STRING,
     flightdate DATE,
@@ -37,13 +42,16 @@ spark.sql(f"""
     n_weather_delay BIGINT,
     n_nas_delay BIGINT,
     n_security_delay BIGINT,
-    n_late_aircraft_delay BIGINT
+    n_late_aircraft_delay BIGINT,
+    n_seats BIGINT
 )
 USING iceberg
 PARTITIONED BY (flightdate)
-""")
+"""
+)
 
-spark.sql(f"""
+spark.sql(
+    f"""
 insert overwrite table {output_table}
 select
     reporting_airline,
@@ -59,10 +67,11 @@ select
     sum(case when weather_delay >= 15 then 1 else 0 end) as n_weather_delay,
     sum(case when nas_delay >= 15 then 1 else 0 end) as n_nas_delay,
     sum(case when security_delay >= 15 then 1 else 0 end) as n_security_delay,
-    sum(case when late_aircraft_delay >= 15 then 1 else 0 end) as n_late_aircraft_delay
-from
-    sarneski44638.fact_bts_flights
-where flightdate is not null
+    sum(case when late_aircraft_delay >= 15 then 1 else 0 end) as n_late_aircraft_delay,
+    sum(n_seats) as n_seats
+from sarneski44638.fact_bts_flights
+left join sarneski44638.dim_airplane
+    on fact_bts_flights.faa_tail_number = dim_airplane.faa_tail_number
 group by
     reporting_airline,
     flightdate,
