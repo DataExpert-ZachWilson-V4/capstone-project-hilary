@@ -31,7 +31,7 @@ spark.sql(
    CREATE TABLE IF NOT EXISTS {output_table} (
     reporting_airline STRING,
     flightdate DATE,
-    airport_id STRING,
+    airport_id BIGINT,
     n_flights BIGINT,
     n_dep_delay BIGINT,
     n_arr_delay BIGINT,
@@ -58,7 +58,7 @@ select
     cast(flightdate as date) as flightdate,
     origin_airport_id as airport_id,
     count(*) as n_flights,
-    sum(case when arr_delay >= 15 then 1 else 0 end) as n_dep_delay,
+    sum(case when dep_delay >= 15 then 1 else 0 end) as n_dep_delay,
     sum(case when arr_delay >= 15 then 1 else 0 end) as n_arr_delay,
     sum(cancelled) as n_cancelled,
     sum(diverted) as n_diverted,

@@ -8,6 +8,8 @@ airport-helpers = {editable = true, path = "."}
 boto3 = "*"
 confluent-kafka = "*"
 trino = "*"
+streamlit = "*"
+plotly = "*"
 
 [dev-packages]
 black = "*"
