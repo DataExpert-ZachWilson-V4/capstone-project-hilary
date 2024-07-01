@@ -160,7 +160,7 @@ More interesting use cases would have data flowing in in real-time so the impact
 
 <img src="images/batch_update_flow.png" height="400%" width="400%" alt="creenshot of airflow dag for batch update flight datat" style="display:block;margin:0 auto;">
 
-<img src="images/batch_update_dag.png" height="50%" width="50%" alt="Screenshot of airflow dag for batch update flight data" style="display:block;margin:0 auto;">
+<img src="images/batch_update_dag.png" alt="Screenshot of airflow dag for batch update flight data" style="display:block;margin:0 auto;">
 
 ## Analysis/Dashboard
 
